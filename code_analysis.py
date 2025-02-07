@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import Optional, List, Dict, Union, Set
 from dataclasses import dataclass
 from mcp.server.fastmcp import FastMCP
+from mcp.server.fastmcp.prompts.base import UserMessage, AssistantMessage
 import os
 from pathspec import PathSpec
 from pathspec.patterns import GitWildMatchPattern
@@ -384,14 +385,29 @@ class FileReader:
 
 class CodeAnalysisServer(FastMCP):
     def __init__(self, name: str):
-        super().__init__(name)
+        # super().__init__(name)
+        # First, call the parent class constructor with capabilities
+        super().__init__(
+            name,
+            capabilities={
+                "prompts": {}  # Enable prompts capability
+            }
+        )
         self.repo_path: Optional[Path] = None
         self.analyzer: Optional[RepoStructureAnalyzer] = None
         self.file_reader: Optional[FileReader] = None
 
+        # Add prompts capability
+        # self.capabilities["prompts"] = {}
+
     def initialize_repo(self, path: str) -> None:
         """Initialize the repository path and analysis tools."""
+        if not path or path in (".", "./"):
+            raise ValueError("Repository path must be an absolute path")
+            
         repo_path = Path(path).resolve()
+        if not repo_path.is_absolute():
+            raise ValueError(f"Repository path must be absolute, got: {repo_path}")
         if not repo_path.exists():
             raise ValueError(f"Repository path does not exist: {repo_path}")
         if not repo_path.is_dir():
@@ -485,6 +501,79 @@ async def read_file(file_path: str) -> str:
         
     except Exception as e:
         return f"Error reading file: {str(e)}"
+
+@mcp.prompt()
+def analyze_code_repository(codebase_path: str) -> list[UserMessage | AssistantMessage]:
+    """Analyze a code repository at the specified path.
+    
+    Args:
+        codebase_path: Absolute path to the code repository
+    """
+    return [
+        UserMessage(f"""You are an AI assistant specialized in codebase analysis, operating as part of an MCP server named code-analysis. Your task is to analyze codebases and answer user questions about them using a set of specialized tools. 
+
+The codebase we are going to analyze is located at {codebase_path}
+The user will ask specific questions about this codebase. To answer the user's questions, follow these steps:
+
+1. Initialize Repository:
+   - Use the `initialize_repository(path: str) -> str` tool with the full path to the repository root directory.
+   - This step is required before using any other tools.
+
+2. Verify Initialization:
+   - Use the `get_repo_info() -> str` tool to confirm successful initialization.
+   - This will show the path, existence verification, and .gitignore status.
+
+3. Get Repository Structure:
+   - Use the `get_repo_structure(sub_path?: str, depth?: int) -> str` tool to generate a tree view of the repository's file structure.
+   - Start with the default depth for an overview, then use sub_path to explore specific directories of interest.
+   - Increase depth only for detailed investigation of specific areas.
+
+4. Read Files:
+   - Use the `read_file(file_path: str) -> str` tool to read and display file contents with syntax recognition.
+   - This tool is limited to files under 1MB and 1000 lines.
+   - Start with README files and other documentation to gain initial context.
+
+5. Systematic Investigation:
+   - Generate an initial hypothesis about the system based on the repository structure and documentation.
+   - Use the tools strategically to explore the codebase, focusing on areas relevant to the user's question.
+   - Continuously update your understanding as you gather more information.
+   - Use the `memory` and/or `sequential-thinking` MCP servers if available
+
+6. Evidence-Based Analysis:
+   - Support all claims with concrete evidence from the codebase.
+   - Clearly distinguish between directly verified code, inferred patterns, and areas requiring further investigation.
+
+7. Comprehensive Analysis Presentation:
+   Present your findings in the following format:
+   a. Initial System Hypothesis
+   b. Investigation Methodology
+   c. Discovered System Characteristics
+   d. Supporting Evidence
+   e. Remaining Uncertainties
+   f. Final Answer to User's Question
+
+Throughout your analysis, document your thought process inside <investigation_log> tags. For each step:
+  - State the current focus or question you're addressing.
+  - List the potential tools you could use and explain your choice.
+  - Document the results of each tool use, quoting relevant code snippets or file contents.
+  - Explain your reasoning when forming hypotheses or drawing conclusions.
+  - Summarize your findings periodically throughout the investigation.
+
+Be sure to use the available tools appropriately and document any limitations or errors encountered. It's okay for this section to be quite long.
+
+Remember:
+- You are operating in the context of an MCP server named code-analysis.
+- Always use the tools provided and do not assume access to any other capabilities.
+- If you encounter any errors or limitations with the tools, clearly state them in your analysis.
+- Maintain a systematic and evidence-based approach throughout your investigation.
+
+Now, you are ready to begin your analysis of the codebase. Please do the necessary steps to initialize. 
+Let me know when you are ready and I will provide the question I want to investigate.
+                    """),
+#         AssistantMessage("""I'll help you analyze this codebase. First, let me initialize the repository to get started. I will then present
+#         my initial insights and ask you the question that you want to investigate.
+# """)
+    ]
 
 if __name__ == "__main__":
     # Initialize and run the server

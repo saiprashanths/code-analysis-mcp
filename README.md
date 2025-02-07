@@ -61,13 +61,23 @@ cd code-analysis-mcp
 
 4. Restart Claude Desktop and start analyzing your code!
 
+5. Ensure the tool is correctly setup
+- Clicking the tools icon should display the `code-analysis` tools
+![tools icon](./docs/images/tools.png)
+![Available MCP Tools](./docs/images/mcptools.png)
+
+- Clicking the integrations button should display the `analyze_code_repository` prompt
+![Integrations icon](./docs/images/integrations.png)
+![Analyze code repo prompt](./docs/images/prompt.png)
 ## 💡 Example Usage
 
 Here's how you might use the tool to understand a complex codebase:
 
+- Start by clicking on the `analyze_code_repository` prompt shown above. That will guide you through the process 
+to initialize the repo and get started.
+
 ```text
-You: I want to use the code-analysis mcp to understand the code at </INSERT/ABSOLUTE/PATH/TO/REPO>. 
-How does the transaction processing work in this system?
+You: How does the transaction processing work in this system?
 
 Claude: Let me analyze the data flow for transactions. 
 Looking at the codebase, I can see that transaction processing happens through several key components:
