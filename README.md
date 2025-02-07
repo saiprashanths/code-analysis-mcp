@@ -27,7 +27,7 @@ git clone https://github.com/saiprashanths/code-analysis-mcp.git
 cd code-analysis-mcp
 ```
 
-2. Install [Claude Desktop](https://claude.ai/desktop). For more instructions on setting up an MCP Server with Claude Desktop app, [see docs](https://modelcontextprotocol.io/quickstart/user)
+2. Install [Claude Desktop App](https://claude.ai/download). For more instructions on setting up an MCP Server with Claude Desktop app, [see docs](https://modelcontextprotocol.io/quickstart/user)
 
 3. Configure the server in Claude Desktop's configuration file:
 - macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
@@ -56,9 +56,11 @@ cd code-analysis-mcp
 Here's how you might use the tool to understand a complex codebase:
 
 ```text
-You: I want to use the code-analysis mcp to understand the code at </INSERT/ABSOLUTE/PATH/TO/REPO>. How does the transaction processing work in this system?
+You: I want to use the code-analysis mcp to understand the code at </INSERT/ABSOLUTE/PATH/TO/REPO>. 
+How does the transaction processing work in this system?
 
-Claude: Let me analyze the data flow for transactions. Looking at the codebase, I can see that transaction processing happens through several key components:
+Claude: Let me analyze the data flow for transactions. 
+Looking at the codebase, I can see that transaction processing happens through several key components:
 
 1. Raw transaction data is captured in the `TransactionEvent` model with fields for:
    - Payment status
