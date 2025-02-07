@@ -68,25 +68,40 @@ Configure the MCP server in your AI model's settings:
 
 ```json
 {
-    "mcpServers": {
-        "code-analysis": {
-            "command": "python",
-            "args": ["code_analysis.py"]
-        }
+  "mcpServers": {
+    "code-analysis": {
+        "command": "uv",
+        "args": [
+            "--directory",
+            "/ABSOLUTE/PATH/TO/REPO",
+            "run",
+            "code_analysis.py"
+        ]
     }
+  }
 }
 ```
 
-Example tool usage:
-```python
-# Initialize repository
-await initialize_repository("/path/to/repo")
+Example tool usage using Claude:
+```
+I want to analyze the repo is at /ABSOLUTE/PATH/TO/REPO using code-analysis mcp
+```
 
-# Get repository structure
-structure = await get_repo_structure(depth=3)
+Now you can ask questions against this repo. Provide as much or as little context as you want to the LLM
+```
+I am seeing this URL in the browser <INSERT_URL>
 
-# Read specific file
-content = await read_file("path/to/file.py")
+In this view, I see a table named "Daily Revenue Summary". Please analyze the code and help me figure out where the data for this is coming from the backend.
+```
+
+```
+In this URL, I see a table named "Publisher Report"  <ANOTHER_URL>
+
+I want to figure out where this data is coming from the backend. In particular, I need the data model and what database table it is being fetched from.
+```
+
+```
+Yes, please show me the SQL query and any specific calculation being performed. I want to see all the code related to fetching data from the backend and all the way to what is displayed in the table in the browser. Please show the relevant file names and code snippets to get a full understanding of what is happening.
 ```
 
 ## Configuration
@@ -96,11 +111,3 @@ Default limits that can be modified in the code:
 - `MAX_CHILDREN`: Children per directory (default: 100)
 - `MAX_SIZE`: File size limit (default: 1MB)
 - `MAX_LINES`: Maximum lines to read (default: 1000)
-
-## License
-
-MIT License
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
