@@ -31,11 +31,9 @@ Yes, please show me the SQL query and any specific calculations being performed.
 ```
 ## Installation
 
-## Clone this Github repo locally
+1. Clone this Github repo locally
 
-## Usage with AI Models
-
-Configure the MCP server in your AI model's settings:
+2. Configure MCP Client app (e.g. Claude Desktop) to use this MCP Server
 
 For using with Claude Desktop app, add this to `~/Library/Application Support/Claude/claude_desktop_config.json`
 ```json
@@ -52,8 +50,11 @@ For using with Claude Desktop app, add this to `~/Library/Application Support/Cl
     }
   }
 }
-
 ```
+
+3. Restart MCP Client
+4. Start using it with any codebase you want (see example usage above) 
+
 ## Available MCP Tools
 
 1. `initialize_repository(path: str)`
