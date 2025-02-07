@@ -63,12 +63,12 @@ cd code-analysis-mcp
 
 5. Ensure the tool is correctly setup
 - Clicking the tools icon should display the `code-analysis` tools
-![tools icon](./docs/images/tools.png | width=100)
-![Available MCP Tools](./docs/images/mcptools.png | width=100)
+<img src="./docs/images/tools.png" width="100">
+<img src="./docs/images/mcptools.png" width="100">
 
 - Clicking the integrations button should display the `analyze_code_repository` prompt
-![Integrations icon](./docs/images/integrations.png | width=100)
-![Analyze code repo prompt](./docs/images/prompt.png | width=100)
+<img src="./docs/images/integrations.png" width="100">
+<img src="./docs/images/prompt.png" width="100">
 ## 💡 Example Usage
 
 Here's how you might use the tool to understand a complex codebase:
@@ -76,7 +76,7 @@ Here's how you might use the tool to understand a complex codebase:
 Start by clicking on the `analyze_code_repository` prompt shown below. That will guide you through the process 
 to initialize the repo and get started.
 
-![Analyze code repo prompt](./docs/images/prompt.png | width=100)
+<img src="./docs/images/prompt.png" width="100">
 
 ```text
 You: How does the transaction processing work in this system?
