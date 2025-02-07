@@ -31,16 +31,13 @@ Yes, please show me the SQL query and any specific calculations being performed.
 ```
 ## Installation
 
-```bash
-# Install dependencies
-pip install -r requirements.txt
-```
+## Clone this Github repo locally
 
 ## Usage with AI Models
 
 Configure the MCP server in your AI model's settings:
 
-For Claude, add this to `~/Library/Application Support/Claude/claude_desktop_config.json`
+For using with Claude Desktop app, add this to `~/Library/Application Support/Claude/claude_desktop_config.json`
 ```json
 {
   "mcpServers": {
