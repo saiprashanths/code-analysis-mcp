@@ -12,6 +12,8 @@ wheels/
 venv/
 ENV/
 .aider*/
+.env
+.python-version
 
 # Development environments
 .idea/
@@ -19,13 +21,31 @@ ENV/
 *.swp
 *.swo
 .DS_Store
+*.sublime-*
+.settings/
+.project
+.pydevproject
 
 # Testing
 .coverage
 htmlcov/
 .pytest_cache/
 .tox/
+.hypothesis/
+.nox/
 
 # Distribution
 *.egg
 *.whl
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Logs and databases
+*.log
+*.sqlite
+*.db
+
+# Cache directories
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
