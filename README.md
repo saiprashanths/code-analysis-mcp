@@ -2,16 +2,6 @@
 
 A Model Context Protocol (MCP) server that enables AI models to understand and analyze codebases through natural language conversations.
 
-## 🎯 Positioning
-
-This tool is a simpler alternative to more sophisticated code analysis tools like [Aider](https://aider.chat/). While it lacks the advanced code analysis capabilities and robustness of tools like Aider, it offers a lightweight solution for codebase exploration if you already have a Claude Pro subscription. The main advantages are:
-
-- **Cost-Effective**: Using your existing Claude Pro subscription means no additional API costs, unlike tools that can get expensive when analyzing large codebases
-- **Simple Setup**: Quick to get started with minimal configuration
-- **Basic Analysis**: Good for high-level code understanding and exploration
-
-Note that due to its simpler approach to code analysis, it may occasionally make errors or provide less detailed insights compared to more specialized tools.
-
 ## ✨ Highlights
 
 - **Natural Code Exploration**: Ask high-level questions about your codebase
@@ -28,6 +18,16 @@ Note that due to its simpler approach to code analysis, it may occasionally make
   ```
   "Show me all the places where we calculate transaction fees"
   ```
+
+## Limitations
+
+This tool is a simpler alternative to more sophisticated code analysis tools / copilot like [Aider](https://aider.chat/). While it lacks the advanced code analysis capabilities and robustness of tools like Aider, it offers a lightweight solution for codebase exploration if you already have a Claude Pro subscription. The main advantages are:
+
+- **Cost-Effective**: Using your existing Claude Pro subscription means no additional API costs, unlike tools that can get expensive when analyzing large codebases
+- **Simple Setup**: Quick to get started with minimal configuration
+- **Basic Analysis**: Good for high-level code understanding and exploration
+
+Note that due to its simpler approach to code analysis, it may make more errors or provide less detailed insights compared to more specialized tools.
 
 ## 🚀 Quick Start
 
