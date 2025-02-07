@@ -191,14 +191,206 @@ class RepoStructureAnalyzer:
 
         raise ValueError(f"Unsupported file type at {current_path}")
 
+class FileReader:
+    def __init__(self, repo_path: Path):
+        self.repo_path = repo_path
+        self.MAX_SIZE = 1024 * 1024  # 1MB
+        self.MAX_LINES = 1000  # Maximum number of lines to return
+
+    def _detect_language(self, file_path: str) -> str:
+        """Detect the programming language based on file extension."""
+        ext = Path(file_path).suffix.lower()
+        
+        # Extensive mapping of file extensions to languages
+        language_map = {
+            # Programming Languages
+            '.py': 'python',
+            '.js': 'javascript',
+            '.jsx': 'javascript',
+            '.ts': 'typescript',
+            '.tsx': 'typescript',
+            '.java': 'java',
+            '.cpp': 'cpp',
+            '.cc': 'cpp',
+            '.hpp': 'cpp',
+            '.c': 'c',
+            '.h': 'c',
+            '.cs': 'csharp',
+            '.rb': 'ruby',
+            '.php': 'php',
+            '.go': 'go',
+            '.rs': 'rust',
+            '.swift': 'swift',
+            '.kt': 'kotlin',
+            '.scala': 'scala',
+            '.m': 'objective-c',
+            '.mm': 'objective-c',
+            
+            # Web Technologies
+            '.html': 'html',
+            '.htm': 'html',
+            '.css': 'css',
+            '.scss': 'scss',
+            '.sass': 'scss',
+            '.less': 'less',
+            '.vue': 'vue',
+            '.svelte': 'svelte',
+            
+            # Data & Config Files
+            '.json': 'json',
+            '.xml': 'xml',
+            '.yaml': 'yaml',
+            '.yml': 'yaml',
+            '.toml': 'toml',
+            '.ini': 'ini',
+            '.conf': 'config',
+            
+            # Documentation
+            '.md': 'markdown',
+            '.markdown': 'markdown',
+            '.rst': 'restructuredtext',
+            '.tex': 'latex',
+            
+            # Shell Scripts
+            '.sh': 'shell',
+            '.bash': 'shell',
+            '.zsh': 'shell',
+            '.fish': 'shell',
+            '.bat': 'batch',
+            '.cmd': 'batch',
+            '.ps1': 'powershell',
+            
+            # Other Common Types
+            '.sql': 'sql',
+            '.r': 'r',
+            '.gradle': 'gradle',
+            '.dockerfile': 'dockerfile',
+            '.env': 'env',
+            '.gitignore': 'gitignore'
+        }
+        
+        # Handle files without extension but specific names
+        if not ext:
+            filename = Path(file_path).name.lower()
+            name_map = {
+                'dockerfile': 'dockerfile',
+                'makefile': 'makefile',
+                'jenkinsfile': 'jenkinsfile',
+                'vagrantfile': 'ruby',
+                '.env': 'env',
+                '.gitignore': 'gitignore'
+            }
+            return name_map.get(filename, 'text')
+            
+        return language_map.get(ext, 'text')
+
+    def read_file(self, file_path: str) -> Dict[str, Union[List[Dict[str, str]], bool]]:
+        """Read and format file contents for LLM consumption."""
+        try:
+            full_path = self.repo_path / file_path
+            
+            # Check if path is safe
+            if not full_path.resolve().is_relative_to(self.repo_path.resolve()):
+                return {
+                    "content": [{
+                        "type": "text",
+                        "text": f"Error: Attempted to access file outside repository: {file_path}"
+                    }],
+                    "isError": True
+                }
+            
+            # Check if file exists
+            if not full_path.exists():
+                return {
+                    "content": [{
+                        "type": "text",
+                        "text": f"File {file_path} not found"
+                    }],
+                    "isError": True
+                }
+            
+            # Check if it's a symbolic link
+            if full_path.is_symlink():
+                return {
+                    "content": [{
+                        "type": "text",
+                        "text": f"Error: Symbolic links are not supported: {file_path}"
+                    }],
+                    "isError": True
+                }
+            
+            # Get file stats
+            stats = full_path.stat()
+            
+            # Check file size
+            if stats.st_size > self.MAX_SIZE:
+                return {
+                    "content": [{
+                        "type": "text",
+                        "text": f"File {file_path} is too large ({stats.st_size} bytes). "
+                             f"Maximum size is {self.MAX_SIZE} bytes."
+                    }],
+                    "isError": True
+                }
+            
+            # Read file content with line limit
+            lines = []
+            line_count = 0
+            truncated = False
+            
+            with open(full_path, 'r', encoding='utf-8') as f:
+                for line in f:
+                    line_count += 1
+                    if line_count <= self.MAX_LINES:
+                        lines.append(line.rstrip('\n'))
+                    else:
+                        truncated = True
+                        break
+            
+            content = '\n'.join(lines)
+            if truncated:
+                content += f"\n\n[File truncated after {self.MAX_LINES} lines]"
+            
+            # Detect language
+            language = self._detect_language(file_path)
+            
+            return {
+                "content": [{
+                    "type": "text",
+                    "text": f"File: {file_path}\n"
+                           f"Language: {language}\n"
+                           f"Size: {stats.st_size} bytes\n"
+                           f"Total lines: {line_count}\n\n"
+                           f"{content}"
+                }]
+            }
+            
+        except UnicodeDecodeError:
+            return {
+                "content": [{
+                    "type": "text",
+                    "text": f"Error: File {file_path} appears to be a binary file"
+                }],
+                "isError": True
+            }
+        except Exception as error:
+            return {
+                "content": [{
+                    "type": "text",
+                    "text": f"Error reading file: {str(error)}"
+                }],
+                "isError": True
+            }
+
 class CodeAnalysisServer(FastMCP):
     def __init__(self, name: str):
         super().__init__(name)
         self.repo_path: Optional[Path] = None
         self.analyzer: Optional[RepoStructureAnalyzer] = None
+        self.file_reader: Optional[FileReader] = None
 
     def initialize_repo(self, path: str) -> None:
-        """Initialize the repository path and structure analyzer."""
+        """Initialize the repository path and analysis tools."""
         repo_path = Path(path).resolve()
         if not repo_path.exists():
             raise ValueError(f"Repository path does not exist: {repo_path}")
@@ -207,6 +399,7 @@ class CodeAnalysisServer(FastMCP):
         
         self.repo_path = repo_path
         self.analyzer = RepoStructureAnalyzer(self.repo_path)
+        self.file_reader = FileReader(self.repo_path)
 
 # Initialize server
 mcp = CodeAnalysisServer("code-analysis")
@@ -267,6 +460,31 @@ async def get_repo_structure(sub_path: Optional[str] = None, depth: Optional[int
         return mcp.analyzer.format_structure(structure)
     except Exception as e:
         return f"Error analyzing repository structure: {str(e)}"
+
+@mcp.tool()
+async def read_file(file_path: str) -> str:
+    """Read and display the contents of a file from the repository.
+    
+    Args:
+        file_path: Path to the file relative to repository root
+    """
+    if not mcp.repo_path or not mcp.file_reader or not mcp.analyzer:
+        return "No code repository has been initialized yet. Please use initialize_repository first."
+
+    try:
+        # Check if file should be ignored based on gitignore patterns
+        if mcp.analyzer.should_ignore(file_path):
+            return f"File {file_path} is ignored based on .gitignore patterns"
+
+        result = mcp.file_reader.read_file(file_path)
+        
+        if result.get("isError", False):
+            return result["content"][0]["text"]
+        
+        return result["content"][0]["text"]
+        
+    except Exception as e:
+        return f"Error reading file: {str(e)}"
 
 if __name__ == "__main__":
     # Initialize and run the server
