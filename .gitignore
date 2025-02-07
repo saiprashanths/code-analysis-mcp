@@ -4,8 +4,28 @@ __pycache__/
 build/
 dist/
 wheels/
-*.egg-info
+*.egg-info/
+*.so
 
 # Virtual environments
-.venv
-.aider*
+.venv/
+venv/
+ENV/
+.aider*/
+
+# Development environments
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+
+# Distribution
+*.egg
+*.whl
