@@ -69,6 +69,7 @@ cd code-analysis-mcp
 - Clicking the integrations button should display the `analyze_code_repository` prompt
 <img src="./docs/images/integrations.png" width="500">
 <img src="./docs/images/prompt.png" width="500">
+
 ## 💡 Example Usage
 
 Here's how you might use the tool to understand a complex codebase:
