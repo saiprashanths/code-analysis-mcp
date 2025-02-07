@@ -1,117 +1,146 @@
 # Code Analysis MCP Server
 
-A Python-based Model Context Protocol (MCP) server that helps AI models understand and analyze codebases. This server provides a standardized interface for code repository analysis through FastMCP.
+A Model Context Protocol (MCP) server that enables AI models to understand and analyze codebases through natural language conversations.
 
-## Features
+## ✨ Highlights
 
-This MCP allows you to ask questions against a codebase (repo). You can invoke this MCP server from your client (e.g. Claude Desktop app). 
+- **Natural Code Exploration**: Ask high-level questions about your codebase
+  ```
+  "What are all the different payment providers integrated in the system?"
+  ```
 
-Example tool usage using Claude:
+- **Deep Code Understanding**: Extract insights about data models and system architecture
+  ```
+  "How does the user authentication flow work from frontend to database?"
+  ```
+
+- **Dynamic Analysis**: Trace data flows and understand system relationships
+  ```
+  "Show me all the places where we calculate transaction fees"
+  ```
+
+## 🚀 Quick Start
+
+1. Install the server:
+```bash
+git clone https://github.com/saiprashanths/code-analysis-mcp.git
+cd code-analysis-mcp
 ```
-I want to analyze the repo is at /ABSOLUTE/PATH/TO/REPO using code-analysis mcp
-```
-Claude then initializes this tool and gets some basic information about to repo to understand the general properties of the codebase.
 
-Now you can ask questions against this repo. Provide as much or as little context as you want to the LLM
-```
-I am seeing this URL in the browser <INSERT_URL>
+2. Install [Claude Desktop](https://claude.ai/desktop). For more instructions on setting up an MCP Server with Claude Desktop app, [see docs](https://modelcontextprotocol.io/quickstart/user)
 
-In this view, I see a table named "Daily Revenue Summary". Please analyze the code and help me figure out where the data for this is coming from the backend.
-```
+3. Configure the server in Claude Desktop's configuration file:
+- macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- Windows: `%APPDATA%\Claude\claude_desktop_config.json`
 
-```
-In this URL, I see a table named "Publisher Report"  <ANOTHER_URL>
-
-I want to figure out where this data is coming from the backend. In particular, I need the data model and what database table it is being fetched from.
-```
-
-You can ask it to retrieve relevant code snippets.
-```
-Yes, please show me the SQL query and any specific calculations being performed. I want to see all the code related to this table, from fetching data from the backend, all the way to what is displayed in the table in the browser. Please show the relevant file names and code snippets to get a full understanding of what is happening.
-```
-## Installation
-
-1. Clone this Github repo locally
-
-2. Configure MCP Client app (e.g. Claude Desktop) to use this MCP Server
-
-For using with Claude Desktop app, add this to `~/Library/Application Support/Claude/claude_desktop_config.json`
 ```json
 {
   "mcpServers": {
     "code-analysis": {
-        "command": "uv",
-        "args": [
-            "--directory",
-            "/ABSOLUTE/PATH/TO/REPO",
-            "run",
-            "code_analysis.py"
-        ]
+      "command": "uv",
+      "args": [
+        "--directory",
+        "/PATH/TO/YOUR/REPO",
+        "run",
+        "code_analysis.py"
+      ]
     }
   }
 }
 ```
 
-3. Restart MCP Client
-4. Start using it with any codebase you want (see example usage above) 
+4. Restart Claude Desktop and start analyzing your code!
 
-## Available MCP Tools
+## 💡 Example Usage
 
-1. `initialize_repository(path: str)`
-   - Initializes the repository for analysis
-   - Validates repository path and structure
-   - Sets up GitIgnore patterns
+Here's how you might use the tool to understand a complex codebase:
 
-2. `get_repo_info()`
-   - Provides repository status and configuration
-   - Shows path and GitIgnore information
-   - Validates repository state
+```text
+You: I want to use the code-analysis mcp to understand the code at </INSERT/ABSOLUTE/PATH/TO/REPO>. How does the transaction processing work in this system?
 
-3. `get_repo_structure(sub_path: Optional[str], depth: Optional[int])`
-   - Maps repository structure with customizable depth
-   - Shows file sizes and directory summaries
-   - Supports subfolder analysis
-   - Respects GitIgnore patterns
+Claude: Let me analyze the data flow for transactions. Looking at the codebase, I can see that transaction processing happens through several key components:
 
-4. `read_file(file_path: str)`
-   - Retrieves and formats file contents
-   - Includes language detection
-   - Provides file metadata
-   - Implements size limits (1MB default)
-   - Handles binary file detection
-  
-## Technical Details
+1. Raw transaction data is captured in the `TransactionEvent` model with fields for:
+   - Payment status
+   - Amount
+   - Fee calculations
+   - Processing timestamps
 
-- **Hierarchical Structure Analysis**: Visualizes repository structure with summaries
-- **Smart File Reading**: Size limits and encoding detection for safe file operations
-- **Comprehensive Language Support**: Detects and handles 40+ programming languages and file types
-- **GitIgnore Integration**: Respects .gitignore patterns and default ignore rules
-- **Safe Operations**: Path validation and symbolic link protection
+2. This data is then processed through the PaymentSummary model, which:
+   - Validates payment provider responses
+   - Calculates processing fees
+   - Records transaction status
 
-## Components
+Would you like me to explain any part of this in more detail?
 
-### RepoStructureAnalyzer
-- Configurable depth (default: 3) and children limits (default: 100)
-- Built-in ignore patterns (.git, __pycache__, node_modules)
-- GitIgnore integration
-- Directory summaries for large folders
+You: What are the key database tables involved?
 
-### FileReader
-- 1MB size limit protection
-- Extensive language detection (40+ types)
-- Safe path validation
-- Line limit controls (1000 lines default)
+Claude: The main tables in the transaction processing pipeline are:
 
-### CodeAnalysisServer
-- FastMCP-based interface
-- Stateful repository management
-- Safe file operations
-- Structured response formatting
+1. transaction_events: Stores raw payment events
+2. payment_summary: Processed transaction records
+3. payment_providers: Provider configuration
+4. merchant_accounts: Account-specific settings
 
-## Configuration
+Let me know if you'd like to see the schema for any of these tables!
+```
 
-Default limits that can be modified in the code:
-- `MAX_DEPTH`: Repository scanning depth (default: 3)
-- `MAX_CHILDREN`: Children per directory (default: 100)
-- `MAX_SIZE`: File size limit (default: 1MB)
-- `MAX_LINES`: Maximum lines to read (default: 1000)
+## 🔧 Available Tools
+
+### initialize_repository
+Initialize a code repository for analysis:
+```python
+initialize_repository("/path/to/repo")
+# Output: Successfully initialized code repository at: /path/to/repo
+```
+
+### get_repo_info
+Retrieve information about the initialized repository:
+```python
+get_repo_info()
+# Output:
+# Code Repository Information:
+# Path: /path/to/repo
+# Exists: True
+# Is Directory: True
+# Found .gitignore file
+```
+
+### get_repo_structure
+Examine repository file structure:
+```python
+get_repo_structure(depth=2)
+# Output:
+# 📁 src/
+#   📁 api/
+#     📄 routes.py
+#     📄 models.py
+#   📁 utils/
+#     📄 helpers.py
+#   📄 main.py
+```
+
+### read_file
+Read and analyze specific files:
+```python
+read_file("src/api/models.py")
+# Output:
+# File: src/api/models.py
+# Language: python
+# Size: 2.3 KB
+# 
+# [File contents...]
+```
+
+## ⚙️ Technical Details
+
+- Default scanning depth: 3 levels
+- Maximum file size: 1MB
+- Maximum lines per file: 1000
+- Ignores paths listed in .gitignore
+- Local file system access only
+- Validates file paths to prevent directory traversal
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
