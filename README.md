@@ -73,8 +73,10 @@ cd code-analysis-mcp
 
 Here's how you might use the tool to understand a complex codebase:
 
-- Start by clicking on the `analyze_code_repository` prompt shown above. That will guide you through the process 
+Start by clicking on the `analyze_code_repository` prompt shown below. That will guide you through the process 
 to initialize the repo and get started.
+
+![Analyze code repo prompt](./docs/images/prompt.png)
 
 ```text
 You: How does the transaction processing work in this system?
