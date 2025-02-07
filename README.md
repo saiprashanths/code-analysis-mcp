@@ -4,12 +4,59 @@ A Python-based Model Context Protocol (MCP) server that helps AI models understa
 
 ## Features
 
-- **Comprehensive Language Support**: Detects and handles 40+ programming languages and file types
-- **Smart File Reading**: Size limits and encoding detection for safe file operations
-- **GitIgnore Integration**: Respects .gitignore patterns and default ignore rules
-- **Hierarchical Structure Analysis**: Visualizes repository structure with summaries
-- **Safe Operations**: Path validation and symbolic link protection
+This MCP allows you to ask questions against a codebase (repo). You can invoke this MCP server from your client (e.g. Claude Desktop app). 
 
+Example tool usage using Claude:
+```
+I want to analyze the repo is at /ABSOLUTE/PATH/TO/REPO using code-analysis mcp
+```
+Claude then initializes this tool and gets some basic information about to repo to understand the general properties of the codebase.
+
+Now you can ask questions against this repo. Provide as much or as little context as you want to the LLM
+```
+I am seeing this URL in the browser <INSERT_URL>
+
+In this view, I see a table named "Daily Revenue Summary". Please analyze the code and help me figure out where the data for this is coming from the backend.
+```
+
+```
+In this URL, I see a table named "Publisher Report"  <ANOTHER_URL>
+
+I want to figure out where this data is coming from the backend. In particular, I need the data model and what database table it is being fetched from.
+```
+
+You can ask it to retrieve relevant code snippets.
+```
+Yes, please show me the SQL query and any specific calculations being performed. I want to see all the code related to this table, from fetching data from the backend, all the way to what is displayed in the table in the browser. Please show the relevant file names and code snippets to get a full understanding of what is happening.
+```
+## Installation
+
+```bash
+# Install dependencies
+pip install -r requirements.txt
+```
+
+## Usage with AI Models
+
+Configure the MCP server in your AI model's settings:
+
+For Claude, add this to `~/Library/Application Support/Claude/claude_desktop_config.json`
+```json
+{
+  "mcpServers": {
+    "code-analysis": {
+        "command": "uv",
+        "args": [
+            "--directory",
+            "/ABSOLUTE/PATH/TO/REPO",
+            "run",
+            "code_analysis.py"
+        ]
+    }
+  }
+}
+
+```
 ## Available MCP Tools
 
 1. `initialize_repository(path: str)`
@@ -34,6 +81,14 @@ A Python-based Model Context Protocol (MCP) server that helps AI models understa
    - Provides file metadata
    - Implements size limits (1MB default)
    - Handles binary file detection
+  
+## Technical Details
+
+- **Hierarchical Structure Analysis**: Visualizes repository structure with summaries
+- **Smart File Reading**: Size limits and encoding detection for safe file operations
+- **Comprehensive Language Support**: Detects and handles 40+ programming languages and file types
+- **GitIgnore Integration**: Respects .gitignore patterns and default ignore rules
+- **Safe Operations**: Path validation and symbolic link protection
 
 ## Components
 
@@ -54,55 +109,6 @@ A Python-based Model Context Protocol (MCP) server that helps AI models understa
 - Stateful repository management
 - Safe file operations
 - Structured response formatting
-
-## Installation
-
-```bash
-# Install dependencies
-pip install -r requirements.txt
-```
-
-## Usage with AI Models
-
-Configure the MCP server in your AI model's settings:
-
-```json
-{
-  "mcpServers": {
-    "code-analysis": {
-        "command": "uv",
-        "args": [
-            "--directory",
-            "/ABSOLUTE/PATH/TO/REPO",
-            "run",
-            "code_analysis.py"
-        ]
-    }
-  }
-}
-```
-
-Example tool usage using Claude:
-```
-I want to analyze the repo is at /ABSOLUTE/PATH/TO/REPO using code-analysis mcp
-```
-
-Now you can ask questions against this repo. Provide as much or as little context as you want to the LLM
-```
-I am seeing this URL in the browser <INSERT_URL>
-
-In this view, I see a table named "Daily Revenue Summary". Please analyze the code and help me figure out where the data for this is coming from the backend.
-```
-
-```
-In this URL, I see a table named "Publisher Report"  <ANOTHER_URL>
-
-I want to figure out where this data is coming from the backend. In particular, I need the data model and what database table it is being fetched from.
-```
-
-```
-Yes, please show me the SQL query and any specific calculation being performed. I want to see all the code related to fetching data from the backend and all the way to what is displayed in the table in the browser. Please show the relevant file names and code snippets to get a full understanding of what is happening.
-```
 
 ## Configuration
 
