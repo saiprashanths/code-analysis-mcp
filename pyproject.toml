@@ -1,7 +1,7 @@
 [project]
 name = "code-analysis-mcp"
 version = "0.1.0"
-description = "Add your description here"
+description = "A Model Context Protocol (MCP) server for codebase analysis"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -9,3 +9,6 @@ dependencies = [
     "mcp[cli]>=1.2.1",
     "pathspec>=0.12.1",
 ]
+
+[project.scripts]
+code-analysis = "main:main"

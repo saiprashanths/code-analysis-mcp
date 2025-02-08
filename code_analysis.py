@@ -1,27 +1,10 @@
-from pathlib import Path
-from typing import Optional, List, Dict, Union, Set
-from dataclasses import dataclass
-from mcp.server.fastmcp import FastMCP
-from mcp.server.fastmcp.prompts.base import UserMessage, AssistantMessage
-import os
-from pathspec import PathSpec
-from pathspec.patterns import GitWildMatchPattern
+# This file is deprecated. Please use the new modular structure in src/ directory
+from src.server.mcp_server import CodeAnalysisServer
 
-@dataclass
-class Summary:
-    file_count: int = 0
-    dir_count: int = 0
-    total_size: int = 0
-
-@dataclass
-class FileStructure:
-    path: str
-    type: str
-    size: Optional[int] = None
-    children: Optional[List['FileStructure']] = None
-    summary: Optional[Summary] = None
-
-class RepoStructureAnalyzer:
+if __name__ == "__main__":
+    # Initialize and run the server
+    mcp = CodeAnalysisServer("code-analysis")
+    mcp.run(transport='stdio')
     def __init__(self, repo_path: Path, max_depth: int = 3, max_children: int = 100):
         self.repo_path = repo_path
         self.MAX_DEPTH = max_depth
