@@ -2,6 +2,8 @@
 
 A Model Context Protocol (MCP) server that enables AI models to understand and analyze codebases through natural language conversations.
 
+<a href="https://glama.ai/mcp/servers/8jplfnetf9"><img width="380" height="200" src="https://glama.ai/mcp/servers/8jplfnetf9/badge" alt="Code Analysis Server MCP server" /></a>
+
 ## ✨ Highlights
 
 - **Natural Code Exploration**: Ask high-level questions about your codebase
